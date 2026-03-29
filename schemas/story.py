@@ -1,6 +1,38 @@
-from sqlalchemy import Column, Integer, String, DateTime , Boolean, ForeignKey, JSON
-from sqlalchemy.sql import func
-from sqlalchemy.orm import relationship
+from typing import List, Optional, Dict 
+from datetime import datetime
+from pydantic import BaseModel
 
-class Story():
-    pass
+class StoryOptionsSchema(BaseModel):
+    text: str
+    node_id: Optional[int] = None
+
+class StoryNodeBase(BaseModel):
+    content: str
+    is_ending: bool = False
+    is_winning_ending: bool =   False
+
+class CompleteStoryNodeResponse(StoryNodeBase):
+    id: int
+    options: List[StoryOptionsSchema]
+
+    class Config:
+        from_attributes = True
+
+class StoryBase(BaseModel):
+    title: str
+    session_id: Optional[str] = None
+
+    class Config:
+        from_attributes = True
+
+class CreateStroyRequest(BaseModel):
+    theme: str
+
+class CompleteStoryResponse(StoryBase):
+    id: int
+    created_at: datetime
+    root_node: CompleteStoryNodeResponse
+    all_nodes: Dict[int, CompleteStoryNodeResponse]
+
+    class Config:
+        from_atttributes = True
